@@ -1,5 +1,7 @@
 package com.example.ivan.moviestatistics.movie
 
+import android.arch.paging.PagedListAdapter
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -8,9 +10,8 @@ import android.widget.TextView
 import com.example.ivan.moviestatistics.R
 import kotlinx.android.synthetic.main.content_movie.view.*
 
-class MovieListAdapter(private val movieList: Array<Movie>,
-                       private val onItemClickListener: OnItemClickListener) :
-        RecyclerView.Adapter<MovieListAdapter.ViewHolder>() {
+class MovieListAdapter(private val onItemClickListener: OnItemClickListener) :
+    PagedListAdapter<Movie, MovieListAdapter.ViewHolder>(MovieDiffCallback) {
 
     interface OnItemClickListener {
         fun onItemClick(movie: Movie)
@@ -28,12 +29,22 @@ class MovieListAdapter(private val movieList: Array<Movie>,
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val movieItem = movieList[position]
-        holder.movieTitleView.text = movieItem.title
-        holder.movieOverviewView.text = movieItem.overview
-        holder.movieYearView.text = movieItem.year.toString()
-        holder.view.setOnClickListener { onItemClickListener.onItemClick(movieList[position]) }
+        val movieItem = getItem(position)
+        holder.movieTitleView.text = movieItem?.title
+        holder.movieOverviewView.text = movieItem?.overview
+        holder.movieYearView.text = movieItem?.year.toString()
+//        holder.view.setOnClickListener { onItemClickListener.onItemClick(movieList[position]) }
     }
 
-    override fun getItemCount() = movieList.size
+    companion object {
+        val MovieDiffCallback = object : DiffUtil.ItemCallback<Movie>() {
+            override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
+                return oldItem.title == newItem.title
+            }
+
+            override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
 }
