@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.ivan.moviestatistics.R
+import com.example.ivan.moviestatistics.movie.models.Movie
 import kotlinx.android.synthetic.main.content_movie.view.*
 
 class MovieListAdapter(private val onItemClickListener: OnItemClickListener) :

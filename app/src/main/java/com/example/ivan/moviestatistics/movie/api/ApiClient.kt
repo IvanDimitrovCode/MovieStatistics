@@ -17,16 +17,16 @@ class ApiClient {
         fun getClient(): ApiInterface? {
             if (retrofit == null) {
                 val client = OkHttpClient.Builder()
-                    .addInterceptor(AuthorizationInterceptor())
-                    .build()
+                        .addInterceptor(AuthorizationInterceptor())
+                        .build()
 
                 retrofit = Retrofit.Builder()
-                    .client(client)
-                    .baseUrl(baseUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build()
-                    .create(ApiInterface::class.java)
+                        .client(client)
+                        .baseUrl(baseUrl)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .build()
+                        .create(ApiInterface::class.java)
             }
             return retrofit
         }
@@ -39,14 +39,15 @@ class ApiClient {
             val original = chain.request()
             val builder = original.newBuilder()
             val queryUrl = original.url().newBuilder()
-                .addQueryParameter("extended", "full,images")
-                .build()
+                    .addQueryParameter("extended", "full,images")
+                    .build()
+
             builder.url(queryUrl)
-                .addHeader("Accept", "application/json")
-                .addHeader("trakt-api-version", apiVersion)
-                .addHeader("trakt-api-key", API_KEY)
-                .method(original.method(), original.body())
-                .build()
+                    .addHeader("Accept", "application/json")
+                    .addHeader("trakt-api-version", apiVersion)
+                    .addHeader("trakt-api-key", API_KEY)
+                    .method(original.method(), original.body())
+                    .build()
 
             return chain.proceed(builder.build())
         }
