@@ -15,7 +15,6 @@ import com.example.ivan.moviestatistics.movie.models.Movie
 
 
 class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListener, SearchView.OnQueryTextListener {
-    //TODO check if api returns elements one by one
     private var movieViewModel: MovieViewModel? = null
     private lateinit var adapter: MovieListAdapter
 
@@ -66,9 +65,9 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
         val orientation = resources.configuration.orientation
 
         val gridLayoutManager = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            GridLayoutManager(this@MovieListActivity, 3)
-        } else {
             GridLayoutManager(this@MovieListActivity, 2)
+        } else {
+            GridLayoutManager(this@MovieListActivity, 1)
         }
 
         recyclerview.layoutManager = gridLayoutManager

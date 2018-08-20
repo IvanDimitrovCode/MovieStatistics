@@ -4,8 +4,8 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.paging.PagedList
-import com.example.ivan.moviestatistics.movie.models.Movie
 import com.example.ivan.moviestatistics.movie.api.ApiClient
+import com.example.ivan.moviestatistics.movie.models.Movie
 import io.reactivex.disposables.CompositeDisposable
 
 class MovieViewModel(application: Application) : AndroidViewModel(application) {
