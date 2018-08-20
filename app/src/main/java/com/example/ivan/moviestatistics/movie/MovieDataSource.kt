@@ -11,7 +11,7 @@ class MovieDataSource(private val moveApi: ApiInterface,
     : ItemKeyedDataSource<String, Movie>() {
     private val movieType = "movie"
 
-    private var pageNumber = 0
+    private var pageNumber = 1
     private var query: String = ""
     val loadState = MutableLiveData<DataLoadState>()
 
@@ -24,7 +24,6 @@ class MovieDataSource(private val moveApi: ApiInterface,
     override fun loadAfter(params: LoadParams<String>, callback: LoadCallback<Movie>) {
         loadState.postValue(DataLoadState.LOADING)
         requestMovieList(params.requestedLoadSize, callback)
-
     }
 
     override fun loadBefore(params: LoadParams<String>, callback: LoadCallback<Movie>) {
@@ -42,7 +41,7 @@ class MovieDataSource(private val moveApi: ApiInterface,
     }
 
     private fun requestTopMovies(requestedLoadSize: Int, callback: LoadCallback<Movie>) {
-        compositeDisposable.add(moveApi.getMovies(pageNumber, requestedLoadSize).subscribe { movies ->
+        compositeDisposable.add(moveApi.getMovies(pageNumber++, requestedLoadSize).subscribe { movies ->
             loadState.postValue(DataLoadState.LOADED)
             callback.onResult(movies)
         })
@@ -50,7 +49,7 @@ class MovieDataSource(private val moveApi: ApiInterface,
 
     private fun requestMovieForQuery(requestedLoadSize: Int, callback: LoadCallback<Movie>) {
         compositeDisposable.add(
-                moveApi.getMoviesForQuery(movieType, query, pageNumber,
+                moveApi.getMoviesForQuery(movieType, query, pageNumber++,
                         requestedLoadSize).subscribe { movies ->
                     loadState.postValue(DataLoadState.LOADED)
                     val transformer = movies.map { generalMovieData -> generalMovieData.movie }.toList()

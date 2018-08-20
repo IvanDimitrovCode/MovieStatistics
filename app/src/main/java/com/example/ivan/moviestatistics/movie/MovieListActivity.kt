@@ -65,9 +65,9 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
         val orientation = resources.configuration.orientation
 
         val gridLayoutManager = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            GridLayoutManager(this@MovieListActivity, 2)
+            GridLayoutManager(this@MovieListActivity, 3)
         } else {
-            GridLayoutManager(this@MovieListActivity, 1)
+            GridLayoutManager(this@MovieListActivity, 2)
         }
 
         recyclerview.layoutManager = gridLayoutManager
