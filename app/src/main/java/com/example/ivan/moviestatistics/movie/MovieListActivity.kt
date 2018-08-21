@@ -2,14 +2,15 @@ package com.example.ivan.moviestatistics.movie
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.arch.paging.PagedList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import com.example.ivan.moviestatistics.R
 import kotlinx.android.synthetic.main.activity_main.*
 import android.support.v7.widget.SearchView
+import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.Menu
 import com.example.ivan.moviestatistics.movie.models.Movie
 
@@ -36,7 +37,7 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
 
     private fun startListDataObservation() {
         movieViewModel?.getMovies()?.observe(this, Observer {
-            adapter.submitList(it)
+            updateListStatus(it)
         })
     }
 
@@ -49,6 +50,14 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
                 }
             }
         })
+    }
+
+    private fun showNoResultsMessage() {
+        noResultsMessage.visibility = View.VISIBLE
+    }
+
+    private fun hideNoResultsMessage() {
+        noResultsMessage.visibility = View.INVISIBLE
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -65,9 +74,9 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
         val orientation = resources.configuration.orientation
 
         val gridLayoutManager = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            GridLayoutManager(this@MovieListActivity, 3)
+            StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.HORIZONTAL)
         } else {
-            GridLayoutManager(this@MovieListActivity, 2)
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         }
 
         recyclerview.layoutManager = gridLayoutManager
@@ -88,10 +97,16 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
     override fun onQueryTextChange(p0: String?): Boolean {
         if (p0 != null) {
             movieViewModel?.getMoviesForQuery(p0)?.observe(this, Observer {
-                adapter.submitList(it)
+                updateListStatus(it)
             })
         }
         return true
+    }
+
+    private fun updateListStatus(it: PagedList<Movie>?) {
+        if (it != null && it.isEmpty()) showNoResultsMessage()
+        else hideNoResultsMessage()
+        adapter.submitList(it)
     }
 
     override fun onItemClick(movie: Movie) {

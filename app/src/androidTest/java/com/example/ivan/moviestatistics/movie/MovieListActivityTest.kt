@@ -17,6 +17,7 @@ import android.support.test.espresso.action.ViewActions.typeText
 import android.widget.AutoCompleteTextView
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.matcher.ViewMatchers.Visibility.*
 import org.hamcrest.core.AllOf
 
 
@@ -30,7 +31,8 @@ class MovieListActivityTest {
     @Test
     fun testStartingOfActivity() {
         Thread.sleep(1000)
-        onView(withId(R.id.loadingIndicator)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.INVISIBLE)))
+        onView(withId(R.id.loadingIndicator)).check(matches(withEffectiveVisibility(INVISIBLE)))
+        onView(withId(R.id.noResultsMessage)).check(matches(withEffectiveVisibility(INVISIBLE)))
         assertTrue(getMovieCount() > 0)
     }
 
@@ -70,6 +72,7 @@ class MovieListActivityTest {
         typeInSearchBar(searchedMovie)
         Thread.sleep(1000)
         assertTrue(getMovieCount() == 0)
+        onView(withId(R.id.noResultsMessage)).check(matches(withEffectiveVisibility(VISIBLE)))
     }
 
     @Test

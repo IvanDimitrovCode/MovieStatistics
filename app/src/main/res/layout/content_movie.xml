@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
     android:orientation="vertical">
 
     <android.support.v7.widget.CardView
@@ -32,7 +33,7 @@
                 android:src="@drawable/ic_image_black_24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/movieYear"/>
+                app:layout_constraintTop_toBottomOf="@+id/movieYear" />
 
             <TextView
                 android:id="@+id/movieOverview"
@@ -44,14 +45,14 @@
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:text="Movie overview"
+                android:text="@string/movie_overview"
                 android:textAlignment="viewStart"
                 android:textSize="12sp"
                 android:textStyle="italic"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/imageView"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ivImage"/>
+                app:layout_constraintTop_toBottomOf="@+id/ivImage" />
 
             <TextView
                 android:id="@+id/movieTitle"
@@ -62,12 +63,12 @@
                 android:layout_marginTop="8dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Title"
+                android:text="@string/title"
                 android:textSize="18sp"
                 android:textStyle="bold|italic"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/movieYear"
@@ -78,7 +79,7 @@
                 android:text="1920"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/movieTitle"/>
+                app:layout_constraintTop_toBottomOf="@+id/movieTitle" />
 
             <ToggleButton
                 android:id="@+id/imageView"
@@ -92,7 +93,7 @@
                 android:textOn="@null"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/movieOverview"
-                tools:text="@null"/>
+                tools:text="@null" />
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>
