@@ -9,18 +9,22 @@ import com.example.ivan.moviestatistics.movie.models.Movie
 import io.reactivex.disposables.CompositeDisposable
 
 class MovieViewModel(application: Application) : AndroidViewModel(application) {
-
     private val compositeDisposable = CompositeDisposable()
     private var repository = MovieRepository(ApiClient.getClient()!!, compositeDisposable)
+    private var liveData: LiveData<PagedList<Movie>>? = null
 
     fun getMovies(): LiveData<PagedList<Movie>> {
         compositeDisposable.clear()
-        return repository.getMovies()
+        if (liveData == null) {
+            liveData = repository.getMovies()
+        }
+        return liveData!!
     }
 
     fun getMoviesForQuery(query: String): LiveData<PagedList<Movie>> {
         compositeDisposable.clear()
-        return repository.getMoviesForQuery(query)
+        liveData = repository.getMoviesForQuery(query)
+        return liveData!!
     }
 
     fun dataLoadStatus(): LiveData<DataLoadState> {
