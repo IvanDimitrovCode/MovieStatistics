@@ -2,6 +2,7 @@ package com.example.ivan.moviestatistics.movie
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.paging.ItemKeyedDataSource
+import android.provider.ContactsContract
 import com.example.ivan.moviestatistics.movie.api.ApiInterface
 import com.example.ivan.moviestatistics.movie.models.Movie
 import io.reactivex.disposables.CompositeDisposable
@@ -50,11 +51,13 @@ class MovieDataSource(private val moveApi: ApiInterface,
     private fun requestMovieForQuery(requestedLoadSize: Int, callback: LoadCallback<Movie>) {
         compositeDisposable.add(
                 moveApi.getMoviesForQuery(movieType, query, pageNumber++,
-                        requestedLoadSize).subscribe { movies ->
+                        requestedLoadSize).subscribe({ movies ->
                     loadState.postValue(DataLoadState.LOADED)
                     val transformer = movies.map { generalMovieData -> generalMovieData.movie }.toList()
                     callback.onResult(transformer)
-                })
+                }, {
+                    loadState.postValue(DataLoadState.FAILED)
+                }))
     }
 
 }

@@ -15,7 +15,7 @@ import android.view.Menu
 import com.example.ivan.moviestatistics.movie.models.Movie
 
 
-class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListener, SearchView.OnQueryTextListener {
+class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     private var movieViewModel: MovieViewModel? = null
     private lateinit var adapter: MovieListAdapter
 
@@ -27,12 +27,33 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
         movieViewModel = ViewModelProviders.of(this).get(MovieViewModel::class.java)
         startDataStatusObservation()
         startListDataObservation()
-
     }
 
-    private fun setupAdapter() {
-        adapter = MovieListAdapter(this)
-        recyclerview.adapter = adapter
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val menuInflater = menuInflater
+        menuInflater.inflate(R.menu.search_menu, menu)
+        val searchMenuItem = menu.findItem(R.id.menu_toolbarsearch)
+        val searchView = searchMenuItem.actionView as SearchView
+        searchView.queryHint = resources.getString(R.string.search_hint)
+        searchView.setOnQueryTextListener(this)
+        return true
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return true
+    }
+
+    override fun onQueryTextChange(query: String?): Boolean {
+        startQuerySearchObservation(query)
+        return true
+    }
+
+    private fun startQuerySearchObservation(query: String?) {
+        if (query != null) {
+            movieViewModel?.getMoviesForQuery(query)?.observe(this, Observer {
+                updateListStatus(it)
+            })
+        }
     }
 
     private fun startListDataObservation() {
@@ -46,28 +67,17 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
             when (it) {
                 DataLoadState.LOADING -> showLoadingIndicator()
                 DataLoadState.LOADED -> hideLoadingIndicator()
+                DataLoadState.FAILED -> hideLoadingIndicator()
                 else -> {
+                    throw Exception("Unhandled state")
                 }
             }
         })
     }
 
-    private fun showNoResultsMessage() {
-        noResultsMessage.visibility = View.VISIBLE
-    }
-
-    private fun hideNoResultsMessage() {
-        noResultsMessage.visibility = View.INVISIBLE
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val menuInflater = menuInflater
-        menuInflater.inflate(R.menu.search_menu, menu)
-        val searchMenuItem = menu.findItem(R.id.menu_toolbarsearch)
-        val searchView = searchMenuItem.actionView as SearchView
-        searchView.queryHint = "search movie"
-        searchView.setOnQueryTextListener(this)
-        return true
+    private fun setupAdapter() {
+        adapter = MovieListAdapter()
+        recyclerview.adapter = adapter
     }
 
     private fun setupGridLayout() {
@@ -82,6 +92,12 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
         recyclerview.layoutManager = gridLayoutManager
     }
 
+    private fun updateListStatus(it: PagedList<Movie>?) {
+        if (it != null && it.isEmpty()) showNoResultsMessage()
+        else hideNoResultsMessage()
+        adapter.submitList(it)
+    }
+
     private fun showLoadingIndicator() {
         loadingIndicator.visibility = View.VISIBLE
     }
@@ -90,25 +106,12 @@ class MovieListActivity : AppCompatActivity(), MovieListAdapter.OnItemClickListe
         loadingIndicator.visibility = View.INVISIBLE
     }
 
-    override fun onQueryTextSubmit(p0: String?): Boolean {
-        return true
+    private fun showNoResultsMessage() {
+        noResultsMessage.visibility = View.VISIBLE
     }
 
-    override fun onQueryTextChange(p0: String?): Boolean {
-        if (p0 != null) {
-            movieViewModel?.getMoviesForQuery(p0)?.observe(this, Observer {
-                updateListStatus(it)
-            })
-        }
-        return true
+    private fun hideNoResultsMessage() {
+        noResultsMessage.visibility = View.INVISIBLE
     }
 
-    private fun updateListStatus(it: PagedList<Movie>?) {
-        if (it != null && it.isEmpty()) showNoResultsMessage()
-        else hideNoResultsMessage()
-        adapter.submitList(it)
-    }
-
-    override fun onItemClick(movie: Movie) {
-    }
 }
