@@ -8,17 +8,16 @@ import com.example.ivan.moviestatistics.movie.models.Movie
 import io.reactivex.disposables.CompositeDisposable
 
 class MovieDataSource(private val moveApi: ApiInterface,
-                      private val compositeDisposable: CompositeDisposable)
+                      private val compositeDisposable: CompositeDisposable,
+                      private val query: String)
     : ItemKeyedDataSource<String, Movie>() {
     private val movieType = "movie"
 
     private var pageNumber = 1
-    private var query: String = ""
     val loadState = MutableLiveData<DataLoadState>()
 
     override fun loadInitial(params: LoadInitialParams<String>, callback: LoadInitialCallback<Movie>) {
         loadState.postValue(DataLoadState.LOADING)
-        query = params.requestedInitialKey.toString()
         requestMovieList(params.requestedLoadSize, callback)
     }
 
@@ -34,7 +33,7 @@ class MovieDataSource(private val moveApi: ApiInterface,
 
     private fun requestMovieList(requestedLoadSize: Int, callback: LoadCallback<Movie>) {
         loadState.postValue(DataLoadState.LOADING)
-        if (query == "null") {
+        if (query == "") {
             requestTopMovies(requestedLoadSize, callback)
         } else {
             requestMovieForQuery(requestedLoadSize, callback)

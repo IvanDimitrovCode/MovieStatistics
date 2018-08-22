@@ -11,9 +11,9 @@ class MovieDataSourceFactory(private val compositeDisposable: CompositeDisposabl
                              private val movieService: ApiInterface) : DataSource.Factory<String, Movie>() {
 
     val dataSourceLiveData = MutableLiveData<MovieDataSource>()
-
+    var query = ""
     override fun create(): DataSource<String, Movie> {
-        val movieDataSource = MovieDataSource(movieService, compositeDisposable)
+        val movieDataSource = MovieDataSource(movieService, compositeDisposable, query)
         dataSourceLiveData.postValue(movieDataSource)
         return movieDataSource
     }

@@ -18,11 +18,14 @@ import android.widget.AutoCompleteTextView
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.matcher.ViewMatchers.Visibility.*
+import android.util.Log
 import org.hamcrest.core.AllOf
 
 
 @RunWith(AndroidJUnit4::class)
 class MovieListActivityTest {
+
+    private val waitTime = 1000L
 
     @Rule
     @JvmField
@@ -30,30 +33,30 @@ class MovieListActivityTest {
 
     @Test
     fun testStartingOfActivity() {
-        Thread.sleep(1000)
-        onView(withId(R.id.loadingIndicator)).check(matches(withEffectiveVisibility(INVISIBLE)))
+        Thread.sleep(waitTime)
         onView(withId(R.id.noResultsMessage)).check(matches(withEffectiveVisibility(INVISIBLE)))
         assertTrue(getMovieCount() > 0)
     }
 
     @Test
     fun testPagination() {
-        Thread.sleep(1000)
+        Thread.sleep(waitTime)
         val countBeforeScroll = getMovieCount()
         scrollToBottom()
-        Thread.sleep(1000)
+        Thread.sleep(waitTime)
         val countAfterScroll = getMovieCount()
         assertTrue(countAfterScroll > countBeforeScroll)
     }
 
     @Test
     fun testRotationSave() {
-        Thread.sleep(1000)
+        Thread.sleep(waitTime)
         scrollToBottom()
-        Thread.sleep(1000)
+        Thread.sleep(waitTime)
         val countBeforeRotation = getMovieCount()
+        scrollToTop()
         rotateDeviceLandscape()
-        Thread.sleep(1000)
+        Thread.sleep(waitTime)
         val countAfterRotation = getMovieCount()
         assertTrue(countAfterRotation == countBeforeRotation)
     }
@@ -62,7 +65,7 @@ class MovieListActivityTest {
     fun testCorrectSearch() {
         val searchedMovie = "happy feet"
         typeInSearchBar(searchedMovie)
-        Thread.sleep(1000)
+        Thread.sleep(waitTime)
         verifyRecyclerViewContainsElement(searchedMovie)
     }
 
@@ -70,7 +73,7 @@ class MovieListActivityTest {
     fun testIncorrectSearch() {
         val searchedMovie = "testtestetesttesttest"
         typeInSearchBar(searchedMovie)
-        Thread.sleep(1000)
+        Thread.sleep(waitTime)
         assertTrue(getMovieCount() == 0)
         onView(withId(R.id.noResultsMessage)).check(matches(withEffectiveVisibility(VISIBLE)))
     }
@@ -78,10 +81,10 @@ class MovieListActivityTest {
     @Test
     fun testPaginationForSearch() {
         typeInSearchBar("g")
-        Thread.sleep(1000)
+        Thread.sleep(waitTime)
         val countBeforeScroll = getMovieCount()
         scrollToBottom()
-        Thread.sleep(1000)
+        Thread.sleep(waitTime)
         val countAfterScroll = getMovieCount()
         assertTrue(countAfterScroll > countBeforeScroll)
     }
@@ -110,5 +113,10 @@ class MovieListActivityTest {
 
         onView(withId(R.id.recyclerview))
                 .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(position))
+    }
+
+    private fun scrollToTop() {
+        onView(withId(R.id.recyclerview))
+                .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(0))
     }
 }

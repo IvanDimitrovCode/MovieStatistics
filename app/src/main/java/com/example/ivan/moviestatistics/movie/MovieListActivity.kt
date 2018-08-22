@@ -3,7 +3,9 @@ package com.example.ivan.moviestatistics.movie
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.arch.paging.PagedList
+import android.content.Context
 import android.content.res.Configuration
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -13,6 +15,7 @@ import android.support.v7.widget.SearchView
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.Menu
 import com.example.ivan.moviestatistics.movie.models.Movie
+import android.widget.Toast
 
 
 class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
@@ -24,9 +27,12 @@ class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         setContentView(R.layout.activity_main)
         setupGridLayout()
         setupAdapter()
-        movieViewModel = ViewModelProviders.of(this).get(MovieViewModel::class.java)
-        startDataStatusObservation()
-        startListDataObservation()
+        setupSwipeToRefresh()
+        if (isNetworkAvailable()) {
+            setupDataObservation()
+        } else {
+            showNoNetworkToast()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -39,25 +45,24 @@ class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         return true
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
+    override fun onQueryTextSubmit(query: String): Boolean {
         return true
     }
 
-    override fun onQueryTextChange(query: String?): Boolean {
-        startQuerySearchObservation(query)
+    override fun onQueryTextChange(query: String): Boolean {
+        if (isNetworkAvailable()) movieViewModel?.getMoviesForQuery(query)
+        else showNoNetworkToast()
         return true
     }
 
-    private fun startQuerySearchObservation(query: String?) {
-        if (query != null) {
-            movieViewModel?.getMoviesForQuery(query)?.observe(this, Observer {
-                updateListStatus(it)
-            })
-        }
+    private fun setupDataObservation() {
+        movieViewModel = ViewModelProviders.of(this).get(MovieViewModel::class.java)
+        startDataStatusObservation()
+        startListDataObservation()
     }
 
     private fun startListDataObservation() {
-        movieViewModel?.getMovies()?.observe(this, Observer {
+        movieViewModel?.movieData?.observe(this, Observer {
             updateListStatus(it)
         })
     }
@@ -75,6 +80,22 @@ class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         })
     }
 
+    private fun setupSwipeToRefresh() {
+        swiperefresh.setOnRefreshListener {
+            if (isNetworkAvailable()) {
+                movieViewModel?.refresh()
+            } else {
+                hideLoadingIndicator()
+                showNoNetworkToast()
+            }
+        }
+    }
+
+    private fun showNoNetworkToast() {
+        Toast.makeText(this, resources.getString(R.string.no_network_message),
+                Toast.LENGTH_LONG).show()
+    }
+
     private fun setupAdapter() {
         adapter = MovieListAdapter()
         recyclerview.adapter = adapter
@@ -84,12 +105,17 @@ class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         val orientation = resources.configuration.orientation
 
         val gridLayoutManager = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.HORIZONTAL)
+            StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
         } else {
             StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         }
-
         recyclerview.layoutManager = gridLayoutManager
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     private fun updateListStatus(it: PagedList<Movie>?) {
@@ -99,11 +125,11 @@ class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     }
 
     private fun showLoadingIndicator() {
-        loadingIndicator.visibility = View.VISIBLE
+        swiperefresh.isRefreshing = true
     }
 
     private fun hideLoadingIndicator() {
-        loadingIndicator.visibility = View.INVISIBLE
+        swiperefresh.isRefreshing = false
     }
 
     private fun showNoResultsMessage() {
