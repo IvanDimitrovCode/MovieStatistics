@@ -25,6 +25,7 @@ class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        removeActionBarTitle()
         setupGridLayout()
         setupAdapter()
         setupSwipeToRefresh()
@@ -53,6 +54,11 @@ class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         if (isNetworkAvailable()) movieViewModel?.getMoviesForQuery(query)
         else showNoNetworkToast()
         return true
+    }
+
+    private fun removeActionBarTitle() {
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayShowHomeEnabled(false)
     }
 
     private fun setupDataObservation() {
