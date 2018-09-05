@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.arch.paging.PagedList
 import android.content.Context
-import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -12,10 +11,14 @@ import android.view.View
 import com.example.ivan.moviestatistics.R
 import kotlinx.android.synthetic.main.activity_main.*
 import android.support.v7.widget.SearchView
-import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.Menu
 import com.example.ivan.moviestatistics.movie.models.Movie
 import android.widget.Toast
+import com.example.ivan.moviestatistics.movie.utils.getGridLayout
+import kotlinx.android.synthetic.main.content_movie.*
+import android.opengl.ETC1.getHeight
+import android.opengl.ETC1.getWidth
+import android.view.Display
 
 
 class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
@@ -108,13 +111,7 @@ class MovieListActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     }
 
     private fun setupGridLayout() {
-        val orientation = resources.configuration.orientation
-
-        val gridLayoutManager = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
-        } else {
-            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        }
+        val gridLayoutManager = getGridLayout(windowManager.defaultDisplay, resources.getDimension(R.dimen.card_view_width).toInt())
         recyclerview.layoutManager = gridLayoutManager
     }
 
